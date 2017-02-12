@@ -3,16 +3,15 @@
 
 function BitmapData(canvas){
 	this.context=canvas.getContext("2d");
-	console.log(canvas.width, canvas.height);
-	this.data=this.context.getImageData(0, 0, canvas.width, canvas.height);
+	this.imageData=this.context.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 BitmapData.prototype={
 	get width(){
-		return this.data.width;
+		return this.imageData.width;
 	},
 	get height(){
-		return this.data.height;
+		return this.imageData.height;
 	}
 };
 
@@ -20,64 +19,49 @@ BitmapData.prototype.getIndex=function(x, y){
 	return 4*(this.width*y+x);
 }
 
-BitmapData.prototype.getPixel=function(x, y){
-	var index=this.getIndex(x, y);
-	return [this.data.data[index], this.data.data[index+1], this.data.data[index+2], this.data.data[index+3]];
-};
-
 BitmapData.prototype.setPixel=function(x, y, r, g, b, a){
 	var index=this.getIndex(x, y);
 
-	this.data.data[index]=r;
-	this.data.data[index+1]=g;
-	this.data.data[index+2]=b;
-	this.data.data[index+3]=a;
+	this.imageData.data[index]=r;
+	this.imageData.data[index+1]=g;
+	this.imageData.data[index+2]=b;
+	this.imageData.data[index+3]=a;
 };
 
-BitmapData.prototype.getColor=function(x, y){
-	if(x>=this.width){
-		x=2*this.width-x-1;
-	}else if(x<0){
-		x=-x;
-	}
-	
-	if(y>=this.height){
-		y=2*this.height-y-1;
-	}else if(y<0){
-		y=-y;
-	}
+BitmapData.prototype.getRGBA=function(x, y){
 	
 	var index=this.getIndex(x, y);
 
-	return new Color(this.data.data[index], this.data.data[index+1], this.data.data[index+2], this.data.data[index+3]);
+	return new RGBA(this.imageData.data[index], this.imageData.data[index+1], this.imageData.data[index+2], this.imageData.data[index+3]);
 };
 
-BitmapData.prototype.setColor=function(x, y, color){
-	this.setPixel(x, y, color.r, color.g, color.b, color.a);
+BitmapData.prototype.setRGBA=function(x, y, rgba){
+	this.setPixel(x, y, rgba.r, rgba.g, rgba.b, rgba.a);
 };
 
 BitmapData.prototype.update=function(){
-	this.context.putImageData(this.data, 0, 0);
+	this.context.putImageData(this.imageData, 0, 0);
 };
 
 //COLOR METHODS:
 
-function Color(r, g, b, a){
+function RGBA(r, g, b, a){
 	this.r=r;
 	this.g=g;
 	this.b=b;
 	this.a=a;
 }
 
-function toHsl(color){
-	var R=color.r/255;
-	var G=color.g/255;
-	var B=color.b/255;
+RGBA.prototype.toHSL=function(){
+	//TODO: maybe, take alpha into account?
+	var R=this.r/255;
+	var G=this.g/255;
+	var B=this.b/255;
 
 	var maxC=Math.max(R, G, B);
 	var minC=Math.min(R, G, B);
 
-	var L=0.5*(minC+maxC); //calculate luminance
+	var L=0.5*(minC+maxC); //calculate lightness
 
 	var S=0;
 	var H=0;
@@ -105,13 +89,21 @@ function toHsl(color){
 		}
 	}
 
-	return {h:H, s:S, l:L};
+	return new HSL(H, S, L);
 }
 
-function fromHsl(h, s, l){ //taken from http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+function HSL(h, s, l){
+	this.h=h;
+	this.s=s;
+	this.l=l;
+}
+
+HSL.prototype.toRGBA=function(){ //taken from http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 	var R, G, B;
 
-	h/=360;
+	var h=this.h/360;
+	var s=this.s;
+	var l=this.l;
 
 	if(s === 0){
 		R = G = B = l; // achromatic
@@ -132,22 +124,11 @@ function fromHsl(h, s, l){ //taken from http://axonflux.com/handy-rgb-to-hsl-and
 		B = hue2rgb(p, q, h - 1/3);
 	}
 
-	return new Color(255*R, 255*G, 255*B, 255);
-}
-
-function limit01(v){
-	if(v>1){
-		return v-1;
-	}else if(v<0){
-		return v+1;
-	}else{
-		return v;
-	}
+	return new RGBA(255*R, 255*G, 255*B, 255);
 }
 
 module.exports={
 	BitmapData: BitmapData,
-	Color: Color,
-	toHsl: toHsl,
-	fromHsl: fromHsl
+	RGBA: RGBA,
+	HSL: HSL
 }

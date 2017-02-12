@@ -22,8 +22,6 @@ var readFile=function(input, image, canvas){
 		image.src=target.result;
 		image.onload=new function(){
 
-			console.log(image.naturalWidth, image.naturalHeight);
-
 			canvas.width=image.naturalWidth;
 			canvas.height=image.naturalHeight;
 			canvas.getContext("2d").drawImage(image, 0, 0);
@@ -39,8 +37,8 @@ document.addEventListener("DOMContentLoaded", function(){
 	applyBtn=document.getElementById("applyBtn");
 	applyBtn.onclick=function(){
 
-		resultCanvas.width=Math.max(hCanvas.width, sCanvas.width, lCanvas.width);
-		resultCanvas.height=Math.max(hCanvas.height, sCanvas.height, lCanvas.height);
+		resultCanvas.width=Math.min(hCanvas.width, sCanvas.width, lCanvas.width);
+		resultCanvas.height=Math.min(hCanvas.height, sCanvas.height, lCanvas.height);
 		
 		var resultBmd=new grafix.BitmapData(resultCanvas);
 		var hBmd=new grafix.BitmapData(hCanvas);
@@ -49,11 +47,17 @@ document.addEventListener("DOMContentLoaded", function(){
 		
 		for(var x=0; x<resultCanvas.width; x++){
 			for(var y=0; y<resultCanvas.height; y++){
-				var h=grafix.toHsl(hBmd.getColor(x, y)).h;
-				var s=grafix.toHsl(sBmd.getColor(x, y)).s;
-				var l=grafix.toHsl(lBmd.getColor(x, y)).l;
 
-				resultBmd.setColor(x, y, grafix.fromHsl(h, s, l));
+				var h=(hBmd.getRGBA(x, y)).toHSL().h;
+				var s=(sBmd.getRGBA(x, y)).toHSL().s;
+				var l=(lBmd.getRGBA(x, y)).toHSL().l;
+
+				if(x==10 && y==10){
+					console.log(h, s, l);
+					console.log(new grafix.HSL(h, s, l).toRGBA());
+				}
+
+				resultBmd.setRGBA(x, y, new grafix.HSL(h, s, l).toRGBA());
 			}
 		}
 

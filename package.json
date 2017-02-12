@@ -3,10 +3,12 @@
 	"version": "0.0.1",
 
 	"devDependencies": {
-		"browserify": "latest"
+		"browserify": "latest",
+		"watchify": "latest"
 	},
 
 	"scripts": {
-		"compile": "browserify src/combineHsl.js -o combineHsl.js"
+		"compile": "browserify src/combineHsl.js -o combineHsl.js",
+		"watch": "watchify src/combineHsl.js -o combineHsl.js -v"
 	}
 }
