@@ -5,6 +5,9 @@ var hFileInput, sFileInput, lFileInput;
 var applyBtn;
 var resultCanvas;
 
+var wrapModeSel;
+var wrapMode=grafix.WrapMode.clamp;
+
 var hImg=new Image();
 var sImg=new Image();
 var lImg=new Image();
@@ -37,8 +40,8 @@ document.addEventListener("DOMContentLoaded", function(){
 	applyBtn=document.getElementById("applyBtn");
 	applyBtn.onclick=function(){
 
-		resultCanvas.width=Math.min(hCanvas.width, sCanvas.width, lCanvas.width);
-		resultCanvas.height=Math.min(hCanvas.height, sCanvas.height, lCanvas.height);
+		resultCanvas.width=Math.max(hCanvas.width, sCanvas.width, lCanvas.width);
+		resultCanvas.height=Math.max(hCanvas.height, sCanvas.height, lCanvas.height);
 		
 		var resultBmd=new grafix.BitmapData(resultCanvas);
 		var hBmd=new grafix.BitmapData(hCanvas);
@@ -48,16 +51,11 @@ document.addEventListener("DOMContentLoaded", function(){
 		for(var x=0; x<resultCanvas.width; x++){
 			for(var y=0; y<resultCanvas.height; y++){
 
-				var h=(hBmd.getRGBA(x, y)).toHSL().h;
-				var s=(sBmd.getRGBA(x, y)).toHSL().s;
-				var l=(lBmd.getRGBA(x, y)).toHSL().l;
+				var h=(hBmd.getRGBA(x, y, wrapMode)).toHSL().h;
+				var s=(sBmd.getRGBA(x, y, wrapMode)).toHSL().s;
+				var l=(lBmd.getRGBA(x, y, wrapMode)).toHSL().l;
 
-				if(x==10 && y==10){
-					console.log(h, s, l);
-					console.log(new grafix.HSL(h, s, l).toRGBA());
-				}
-
-				resultBmd.setRGBA(x, y, new grafix.HSL(h, s, l).toRGBA());
+				resultBmd.setRGBA(x, y, wrapMode, new grafix.HSL(h, s, l).toRGBA());
 			}
 		}
 
@@ -73,5 +71,16 @@ document.addEventListener("DOMContentLoaded", function(){
 
 	lFileInput=document.getElementById("lFileInput");
 	lFileInput.onchange=readFile.bind(null, lFileInput, lImg, lCanvas);
+
+	wrapModeSel=document.getElementById("wrapModeSel");
+	wrapModeSel.addEventListener("change", function(){
+		if(wrapModeSel.value=="wrap"){
+			wrapMode=grafix.WrapMode.wrap;
+		}else if(wrapModeSel.value=="clamp"){
+			wrapMode=grafix.WrapMode.clamp;
+		}else{
+			wrapMode=grafix.WrapMode.mirror;
+		}
+	});
 
 });

@@ -1,4 +1,5 @@
 
+
 //BITMAP DATA METHODS:
 
 function BitmapData(canvas){
@@ -15,12 +16,15 @@ BitmapData.prototype={
 	}
 };
 
-BitmapData.prototype.getIndex=function(x, y){
+BitmapData.prototype.getIndex=function(x, y, wrapMode){
+	x=wrapMode(x, this.width);
+	y=wrapMode(y, this.height);
+
 	return 4*(this.width*y+x);
 }
 
-BitmapData.prototype.setPixel=function(x, y, r, g, b, a){
-	var index=this.getIndex(x, y);
+BitmapData.prototype.setPixel=function(x, y, wrapMode, r, g, b, a){
+	var index=this.getIndex(x, y, wrapMode);
 
 	this.imageData.data[index]=r;
 	this.imageData.data[index+1]=g;
@@ -28,15 +32,15 @@ BitmapData.prototype.setPixel=function(x, y, r, g, b, a){
 	this.imageData.data[index+3]=a;
 };
 
-BitmapData.prototype.getRGBA=function(x, y){
+BitmapData.prototype.getRGBA=function(x, y, wrapMode){
 	
-	var index=this.getIndex(x, y);
+	var index=this.getIndex(x, y, wrapMode);
 
 	return new RGBA(this.imageData.data[index], this.imageData.data[index+1], this.imageData.data[index+2], this.imageData.data[index+3]);
 };
 
-BitmapData.prototype.setRGBA=function(x, y, rgba){
-	this.setPixel(x, y, rgba.r, rgba.g, rgba.b, rgba.a);
+BitmapData.prototype.setRGBA=function(x, y, wrapMode, rgba){
+	this.setPixel(x, y, wrapMode, rgba.r, rgba.g, rgba.b, rgba.a);
 };
 
 BitmapData.prototype.update=function(){
@@ -50,7 +54,7 @@ function RGBA(r, g, b, a){
 	this.g=g;
 	this.b=b;
 	this.a=a;
-}
+};
 
 RGBA.prototype.toHSL=function(){
 	//TODO: maybe, take alpha into account?
@@ -90,13 +94,13 @@ RGBA.prototype.toHSL=function(){
 	}
 
 	return new HSL(H, S, L);
-}
+};
 
 function HSL(h, s, l){
 	this.h=h;
 	this.s=s;
 	this.l=l;
-}
+};
 
 HSL.prototype.toRGBA=function(){ //taken from http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 	var R, G, B;
@@ -125,10 +129,45 @@ HSL.prototype.toRGBA=function(){ //taken from http://axonflux.com/handy-rgb-to-h
 	}
 
 	return new RGBA(255*R, 255*G, 255*B, 255);
+};
+
+function wrap(x, width){
+	if(x>=width){
+		x=x%width;
+	}else if(x<0){
+		x=width-(x%width);
+	}
+
+	return x;
+}
+
+//WRAP MODE METHODS:
+var WrapMode={
+	clamp: function(x, width){
+		if(x>=width){
+			x=width-1;
+		}else if(x<0){
+			x=0;
+		}
+		return x;
+	},
+
+	wrap: wrap,
+
+	mirror: function(x, width){
+		if(x>=width || x<0){
+			x=wrap(x, 2*width);
+			if(x>=width){
+				x=2*width-x-1;
+			}
+		}
+		return x;
+	}
 }
 
 module.exports={
 	BitmapData: BitmapData,
 	RGBA: RGBA,
-	HSL: HSL
+	HSL: HSL,
+	WrapMode: WrapMode
 }
