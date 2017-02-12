@@ -1,0 +1,12 @@
+{
+	"name": "combineHsl",
+	"version": "0.0.1",
+
+	"devDependencies": {
+		"browserify": "latest"
+	},
+
+	"scripts": {
+		"compile": "browserify src/combineHsl.js -o combineHsl.js"
+	}
+}

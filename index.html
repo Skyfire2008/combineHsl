@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>CombineHsl</title>
+</head>
+<body>
+<script src="combineHsl.js"></script>
+<div>
+	<div>
+		<label for="hFileInput">Hue file:</label>
+		<input type="file" id="hFileInput" accept="image/*"/>
+	</div>
+	<div>
+		<label for="sFileInput">Saturation file:</label>
+		<input type="file" id="sFileInput" accept="image/*"/>
+	</div>
+	<div>
+		<label for="lFileInput">Lightness file:</label>
+		<input type="file" id="lFileInput" accept="image/*"/>
+	</div>
+	<div>
+		<button id="applyBtn">Apply</button>
+	</div>
+</div>
+<div>
+	<canvas id="resultCanvas" width="640" height="480"></canvas>
+</div>
+</body>
+</html>
