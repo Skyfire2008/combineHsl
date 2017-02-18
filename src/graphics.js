@@ -21,7 +21,7 @@ BitmapData.prototype.getIndex=function(x, y, wrapMode){
 	y=wrapMode(y, this.height);
 
 	return 4*(this.width*y+x);
-}
+};
 
 BitmapData.prototype.setPixel=function(x, y, wrapMode, r, g, b, a){
 	var index=this.getIndex(x, y, wrapMode);
@@ -54,7 +54,7 @@ function RGBA(r, g, b, a){
 	this.g=g;
 	this.b=b;
 	this.a=a;
-};
+}
 
 RGBA.prototype.toHSL=function(){
 	//TODO: maybe, take alpha into account?
@@ -100,7 +100,7 @@ function HSL(h, s, l){
 	this.h=h;
 	this.s=s;
 	this.l=l;
-};
+}
 
 HSL.prototype.toRGBA=function(){ //taken from http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 	var R, G, B;
@@ -163,11 +163,11 @@ var WrapMode={
 		}
 		return x;
 	}
-}
+};
 
 module.exports={
 	BitmapData: BitmapData,
 	RGBA: RGBA,
 	HSL: HSL,
 	WrapMode: WrapMode
-}
+};

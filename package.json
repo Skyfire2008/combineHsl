@@ -9,6 +9,8 @@
 
 	"scripts": {
 		"compile": "browserify src/combineHsl.js -o combineHsl.js",
-		"watch": "watchify src/combineHsl.js -o combineHsl.js -v"
+		"watchMain": "watchify src/combineHsl.js -o combineHsl.js -v",
+		"watchWorker": "watchify src/worker.js -o worker.js -v",
+		"watch": "npm run watchMain | npm run watchWorker"
 	}
 }

@@ -22,6 +22,8 @@ sCanvas.loaded=false;
 var lCanvas=document.createElement("canvas");
 lCanvas.loaded=false;
 
+var worker=new Worker("worker.js");
+
 var readFile=function(input, image, canvas){
 
 	if(input.files.length>0){ //check, that the file was selected
@@ -50,6 +52,8 @@ document.addEventListener("DOMContentLoaded", function(){
 
 	applyBtn=document.getElementById("applyBtn");
 	applyBtn.onclick=function(){
+
+		worker.postMessage({wrapMode: wrapModeSel.value, imgSizeMode: imgSizeModeSel.value});
 
 		if(hCanvas.loaded && sCanvas.loaded && lCanvas.loaded) {
 
