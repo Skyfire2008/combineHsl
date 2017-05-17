@@ -11,6 +11,9 @@ var wrapMode=grafix.WrapMode.clamp;
 var imgSizeModeSel;
 var imgSizeMode=Math.max;
 
+var threadNumInput;
+var threadNum=1;
+
 var hImg=new Image();
 var sImg=new Image();
 var lImg=new Image();
@@ -22,7 +25,8 @@ sCanvas.loaded=false;
 var lCanvas=document.createElement("canvas");
 lCanvas.loaded=false;
 
-var worker=new Worker("worker.js");
+var workers=[];
+var hslWorkersReady=[];
 
 var readFile=function(input, image, canvas){
 
@@ -46,6 +50,10 @@ var readFile=function(input, image, canvas){
 	}
 };
 
+var onHslWorkerRespond=function(num, ev){
+
+};
+
 document.addEventListener("DOMContentLoaded", function(){
 
 	resultCanvas=document.getElementById("resultCanvas");
@@ -53,11 +61,17 @@ document.addEventListener("DOMContentLoaded", function(){
 	applyBtn=document.getElementById("applyBtn");
 	applyBtn.onclick=function(){
 
-		worker.postMessage({wrapMode: wrapModeSel.value, imgSizeMode: imgSizeModeSel.value});
+		//read number of threads first
+		threadNum=parseInt(threadNumInput.value);
 
-		if(hCanvas.loaded && sCanvas.loaded && lCanvas.loaded) {
+		if(isNaN(threadNum) || threadNum<1){ //check, that thread number is valid
+			alert("Please enter a valid thread number first");
 
-			resultCanvas.width = imgSizeMode(hCanvas.width, sCanvas.width, lCanvas.width);
+		}else if(!hCanvas.loaded || !sCanvas.loaded || !lCanvas.loaded){ //cheack, that all images are loaded
+
+			alert("Please load all images first!");
+
+			/*resultCanvas.width = imgSizeMode(hCanvas.width, sCanvas.width, lCanvas.width);
 			resultCanvas.height = imgSizeMode(hCanvas.height, sCanvas.height, lCanvas.height);
 
 			var resultBmd = new grafix.BitmapData(resultCanvas);
@@ -76,10 +90,14 @@ document.addEventListener("DOMContentLoaded", function(){
 				}
 			}
 
-			resultBmd.update();
+			resultBmd.update();*/
 
-		}else{
-			alert("Please load all images first!");
+		}else{ //if all tests passed, run
+
+			for(let i=0; i<threadNum; i++){
+				workers.push(new Worker("worker.js"));
+				
+			}
 		}
 		
 	};
@@ -112,5 +130,7 @@ document.addEventListener("DOMContentLoaded", function(){
 			imgSizeMode=Math.max;
 		}
 	});
+
+	threadNumInput=document.getElementById("threadNumInput");
 
 });
