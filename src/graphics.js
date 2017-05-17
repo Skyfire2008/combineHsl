@@ -21,7 +21,7 @@ BitmapData.prototype.getIndex=function(x, y, wrapMode){
 	y=wrapMode(y, this.height);
 
 	return 4*(this.width*y+x);
-}
+};
 
 BitmapData.prototype.setPixel=function(x, y, wrapMode, r, g, b, a){
 	var index=this.getIndex(x, y, wrapMode);

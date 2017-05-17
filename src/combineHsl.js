@@ -26,17 +26,22 @@ var readFile=function(input, image, canvas){
 
 	if(input.files.length>0){ //check, that the file was selected
 
+		console.log(input.files);
+
 		fr = new FileReader();
 
 		fr.onload = function (e) {
 			var target = e.target;
 			image.src = target.result;
-			image.onload = new function () {
+			image.onload = function () {
 
 				canvas.width = image.naturalWidth;
 				canvas.height = image.naturalHeight;
 				canvas.loaded = true;
 				canvas.getContext("2d").drawImage(image, 0, 0);
+
+				console.log(image.naturalWidth, image.naturalHeight);
+				console.log(canvas);
 			};
 		};
 		fr.readAsDataURL(input.files[0]);
